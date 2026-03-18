@@ -65,7 +65,8 @@ with st.sidebar:
     # --- B. Model Selection (强力状态锁定版) ---
     st.subheader("2. Prediction Model")
     model_config = predictor.MODELS_CONFIG
-    model_map = {v['name']: k for k, v in model_config.items()}
+    # 过滤掉 MIXED_48H（仅用于48h预警，不在用户选择列表中）
+    model_map = {v['name']: k for k, v in model_config.items() if k != 'MIXED_48H'}
     display_names = list(model_map.keys())
     
     # 🔒 1. 显式初始化“硬皮笔记本”
