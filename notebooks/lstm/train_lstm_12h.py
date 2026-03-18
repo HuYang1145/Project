@@ -88,7 +88,7 @@ def train_component_model(data_series, model_name):
             loss = criterion(output, y_batch)
             loss.backward()
             optimizer.step()
-    print(" Done ✅")
+    print(" Done")
     torch.save(model.state_dict(), os.path.join(Config.MODEL_DIR, f"{model_name}.pth"))
     return model
 
@@ -243,7 +243,7 @@ def main():
     rmse_raw = np.sqrt(mean_squared_error(true_vals, pred_raw))
     rmse_corrected = np.sqrt(mean_squared_error(true_vals, pred_corrected))
 
-    print(f"\n📊 Final Results (12h forecast):")
+    print(f"\nFinal Results (12h forecast):")
     print(f"Base Model RMSE: {rmse_raw:.4f}")
     print(f"With LEC RMSE: {rmse_corrected:.4f}")
 
