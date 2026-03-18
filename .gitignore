@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# 模型文件（太大）
+models/
+*.pkl
+*.pth
+*.joblib
+*.dm4stg
+
+# 数据文件（太大）
+data/raw/
+data/processed/
+data/dataset/
+*.csv
+*.npy
+
+# 数据库
+*.db
+*.sqlite
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 系统文件
+.DS_Store
+Thumbs.db
+__MACOSX/
+
+# 日志
+*.log
+
+# 临时文件
+*.tmp
+*.temp
+
+# LaTeX
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.pdf
+
+# 结果图片（可选保留）
+# results/figures_summary/*.png
