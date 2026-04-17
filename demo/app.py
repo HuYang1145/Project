@@ -160,6 +160,8 @@ if "last_mode" not in st.session_state:
     st.session_state.last_mode = None
 if "alert_cache" not in st.session_state:
     st.session_state.alert_cache = {}
+if "api_predictions" not in st.session_state:
+    st.session_state.api_predictions = {}
 
 df_history = None
 df_weather = None
@@ -228,19 +230,12 @@ st.markdown("---")
 # ==========================================
 # 4.5. 48-hour pollution alert
 # ==========================================
-alert_paused_for_memory = selected_key == "MIXED"
-
 should_run_alert = (
     df_history is not None
     and len(df_history) >= 48
-    and selected_key not in {"DIFFUSION", "MIXED"}
+    and selected_key not in {"DIFFUSION"}
     and st.session_state.get("enable_48h_alert", True)
 )
-
-if alert_paused_for_memory:
-    predictor.clear_hybrid_resources()
-    if st.session_state.get("enable_48h_alert", True):
-        st.info("48-hour alert is paused while BiLSTM-Hybrid is selected so only one LSTM model stays in memory.")
 
 if should_run_alert:
     alert_cache_key = build_alert_cache_key(mode, data_context)
@@ -306,8 +301,16 @@ if mode == "Historical Simulation Demo" and ground_truth is not None:
     )
 
 if df_history is not None:
-    with st.spinner(f"Running {selected_name} model inference..."):
-        pred_df = predictor.load_and_predict(selected_key, data_context, n_steps)
+    cache_key_ui = f"{mode}:{selected_key}:{n_steps}:{df_history['ds'].iloc[-1].isoformat()}:{len(df_history)}"
+    
+    if mode == "Real-time API Mode" and cache_key_ui in st.session_state.api_predictions:
+        pred_df = st.session_state.api_predictions[cache_key_ui].copy()
+    else:
+        with st.spinner(f"Running {selected_name} model inference..."):
+            pred_df = predictor.load_and_predict(selected_key, data_context, n_steps)
+            
+        if mode == "Real-time API Mode" and pred_df is not None:
+            st.session_state.api_predictions[cache_key_ui] = pred_df.copy()
 
     if pred_df is not None:
         pred_df["yhat"] = pred_df["yhat"].clip(lower=0)

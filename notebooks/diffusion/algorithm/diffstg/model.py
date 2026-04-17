@@ -49,7 +49,7 @@ class DiffSTG(nn.Module):
         self.sigma2 = self.beta
 
     def q_xt_x0(self, x0: torch.Tensor, t: torch.Tensor, eps: Optional[torch.Tensor]=None):
-        """
+        r"""
         Sample from  q(x_t|x_0) ~ N(x_t; \sqrt\bar\alpha_t * x_0, (1 - \bar\alpha_t)I)
         """
         if eps is None:

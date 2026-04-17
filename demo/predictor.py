@@ -3,6 +3,7 @@
 
 import os
 import sys
+import threading
 import warnings
 
 import joblib
@@ -197,7 +198,23 @@ def clear_hybrid_resources():
 # ==========================================
 # 3. Main inference entry point
 # ==========================================
-def load_and_predict(selected_model_key, data_context, steps=12):
+GLOBAL_ML_LOCK = threading.Lock()
+
+@st.cache_data(show_spinner=False)
+def fast_decompose(arr_tuple):
+    """Use a tuple input so Streamlit cache keys remain stable."""
+    from PyEMD import CEEMDAN, EEMD
+    arr = np.array(arr_tuple)
+    return CEEMDAN(trials=2)(arr), EEMD(trials=2)(arr)
+
+@st.cache_data(show_spinner=False)
+def fast_decompose_48h(arr_tuple):
+    """Use a tuple input so Streamlit cache keys remain stable."""
+    from PyEMD import CEEMDAN, EEMD
+    arr = np.array(arr_tuple)
+    return CEEMDAN(trials=5)(arr), EEMD(trials=2)(arr)
+
+def _inner_load_and_predict(selected_model_key, data_context, steps=12):
     cfg = MODELS_CONFIG[selected_model_key]
 
     hist_df = data_context.get("history")
@@ -295,12 +312,8 @@ def load_and_predict(selected_model_key, data_context, steps=12):
 
             scaled_input = scaler.transform(raw_input).flatten()
 
-            @st.cache_data(show_spinner=False)
-            def fast_decompose(arr):
-                return CEEMDAN(trials=2)(arr), EEMD(trials=2)(arr)
-
             with st.spinner("Running signal decomposition..."):
-                imfs_a, imfs_b = fast_decompose(scaled_input)
+                imfs_a, imfs_b = fast_decompose(tuple(scaled_input))
 
             def get_branch_pred(models_list, imfs):
                 total_pred = np.zeros(12)
@@ -446,12 +459,6 @@ def load_and_predict(selected_model_key, data_context, steps=12):
             raw_input = hist_df["y"].values[-48:].reshape(-1, 1)
             scaled_input = scaler.transform(raw_input).flatten()
 
-            @st.cache_data(show_spinner=False)
-            def fast_decompose_48h(arr_tuple):
-                """Use a tuple input so Streamlit cache keys remain stable."""
-                arr = np.array(arr_tuple)
-                return CEEMDAN(trials=5)(arr), EEMD(trials=2)(arr)
-
             with st.spinner("Running 48-hour signal decomposition..."):
                 imfs_a, imfs_b = fast_decompose_48h(tuple(scaled_input))
 
@@ -484,6 +491,19 @@ def load_and_predict(selected_model_key, data_context, steps=12):
             return None
 
     return None
+
+
+def load_and_predict(selected_model_key, data_context, steps=12):
+    """
+    Thread-safe wrapper to prevent concurrent execution of heavy models 
+    due to Streamlit's rapid rerun behavior.
+    """
+    # Fast-fail for models trying to run in unsupported environments to avoid lock contention
+    if selected_model_key == "DIFFUSION" and data_context.get("type") != "simulation":
+        return None
+
+    with GLOBAL_ML_LOCK:
+        return _inner_load_and_predict(selected_model_key, data_context, steps)
 
 
 def predict_48h_pollution_alert(data_context):
