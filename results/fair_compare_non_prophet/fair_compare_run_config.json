@@ -1,0 +1,22 @@
+{
+  "station": "Dongsi",
+  "history_len": 168,
+  "steps": 12,
+  "horizons": [
+    3,
+    6,
+    12
+  ],
+  "cutoff_mode": "latest",
+  "cutoff_index": 99972,
+  "seed": 42,
+  "generated_files": [
+    "D:\\文件\\大四下\\Project\\results\\fair_compare_non_prophet\\fair_compare_predictions.csv",
+    "D:\\文件\\大四下\\Project\\results\\fair_compare_non_prophet\\fair_compare_metrics.csv",
+    "D:\\文件\\大四下\\Project\\results\\fair_compare_non_prophet\\fair_compare_forecast_12h.png",
+    "D:\\文件\\大四下\\Project\\results\\fair_compare_non_prophet\\fair_compare_mae.png",
+    "D:\\文件\\大四下\\Project\\results\\fair_compare_non_prophet\\fair_compare_rmse.png",
+    "D:\\文件\\大四下\\Project\\results\\fair_compare_non_prophet\\fair_compare_r2.png",
+    "D:\\文件\\大四下\\Project\\results\\fair_compare_non_prophet\\fair_compare_summary.txt"
+  ]
+}

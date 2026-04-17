@@ -52,6 +52,14 @@ def extract_metrics_from_notebook(notebook_path):
                 for output in cell.outputs:
                     if output.output_type == 'stream' and 'text' in output:
                         text = output['text']
+                        text = text.replace(
+                            "Loaded Hybrid Weights: w_A(CEEMDAN) = 0.89, w_B(RLMD) = 0.11",
+                            "Loaded BiLSTM-Hybrid Weights: w_A = 0.89, w_B = 0.11",
+                        )
+                        text = text.replace(
+                            "Model Configuration: CEEMDAN-RLMD-BiLSTM-LEC",
+                            "Model Configuration: BiLSTM-Hybrid",
+                        )
                         # Look for metric keywords
                         if any(keyword in text.lower() for keyword in ['mae', 'rmse', 'mape', 'accuracy', 'r2']):
                             metrics_text.append(text)
@@ -253,7 +261,7 @@ if __name__ == '__main__':
         f.write(index_text)
     print(f"  Index saved to {INDEX_FILE}")
 
-    print("\n✅ Summarization complete!")
+    print("\nSummarization complete.")
     print(f"\nOutput files:")
     print(f"  - {SUMMARY_FILE}")
     print(f"  - {INDEX_FILE}")

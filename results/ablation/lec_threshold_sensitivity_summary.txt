@@ -1,0 +1,9 @@
+LEC Threshold Sensitivity (12h BiLSTM-Hybrid, Dongsi)
+==============================================================
+w_A=0.894737, samples=9976
+
+threshold=NoLEC, corrections=0, MAE(3/6/12h)=(6.7518, 8.2163, 13.6593), RMSE(3/6/12h)=(8.7282, 11.4798, 18.2799), Recall@3h=0.7115
+threshold=6.0, corrections=2946, MAE(3/6/12h)=(7.2451, 8.2627, 13.8002), RMSE(3/6/12h)=(9.2475, 11.4993, 18.3538), Recall@3h=0.8077
+threshold=8.0, corrections=1862, MAE(3/6/12h)=(7.0235, 8.2291, 13.7330), RMSE(3/6/12h)=(9.0315, 11.4730, 18.3095), Recall@3h=0.7981
+threshold=10.0, corrections=1213, MAE(3/6/12h)=(6.9103, 8.2164, 13.7040), RMSE(3/6/12h)=(8.9093, 11.4636, 18.2936), Recall@3h=0.7981
+threshold=12.0, corrections=791, MAE(3/6/12h)=(6.8345, 8.2124, 13.6885), RMSE(3/6/12h)=(8.8170, 11.4612, 18.2869), Recall@3h=0.7596

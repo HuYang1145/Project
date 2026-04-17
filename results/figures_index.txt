@@ -1,0 +1,34 @@
+======================================================================
+Figures Index
+Generated: 2026-03-09 21:51:27
+======================================================================
+
+[LSTM Classification (3 days)]
+  - lstm_classification_3days_confusion.png
+    Description: Confusion matrix
+  - lstm_classification_3days_curves.png
+    Description: Training curves (loss & accuracy)
+
+[LSTM Classification (5 days)]
+  - lstm_classification_5days_confusion.png
+    Description: Confusion matrix
+  - lstm_classification_5days_curves.png
+    Description: Training curves (loss & accuracy)
+
+[LSTM Classification (7 days)]
+  - lstm_classification_7days_confusion.png
+    Description: Confusion matrix
+  - lstm_classification_7days_curves.png
+    Description: Training curves (loss & accuracy)
+
+[Prophet Classification]
+  - prophet_classification_accuracy.png
+    Description: Accuracy comparison across prediction horizons
+  - prophet_classification_confusion_matrix.png
+    Description: Confusion matrix
+  - prophet_classification_distribution.png
+    Description: Class distribution
+
+======================================================================
+Total figures: 9
+======================================================================

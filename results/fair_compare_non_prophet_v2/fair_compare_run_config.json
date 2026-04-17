@@ -1,0 +1,20 @@
+{
+  "dataset_series": "D:\\文件\\大四下\\Project\\data\\processed\\lstm\\Dongsi_PM2.5.csv",
+  "flow_file": "D:\\文件\\大四下\\Project\\data\\processed\\diffusion\\AIR_BJ\\flow.npy",
+  "station": "Dongsi",
+  "common_label_start_idx": 89997,
+  "common_label_end_idx": 99972,
+  "num_eval_windows": 9976,
+  "horizons": [
+    3,
+    6,
+    12
+  ],
+  "files": [
+    "D:\\文件\\大四下\\Project\\results\\fair_compare_non_prophet_v2\\fair_compare_metrics.csv",
+    "D:\\文件\\大四下\\Project\\results\\fair_compare_non_prophet_v2\\fair_compare_predictions_long.csv",
+    "D:\\文件\\大四下\\Project\\results\\fair_compare_non_prophet_v2\\fair_compare_series_triptych.png",
+    "D:\\文件\\大四下\\Project\\results\\fair_compare_non_prophet_v2\\fair_compare_metrics_bars.png",
+    "D:\\文件\\大四下\\Project\\results\\fair_compare_non_prophet_v2\\fair_compare_summary.txt"
+  ]
+}

@@ -1,0 +1,36 @@
+# === Environment and UI ===
+jupyter
+notebook
+ipykernel
+ipywidgets
+easydict
+
+# === Core data processing ===
+numpy
+pandas
+scipy
+scikit-learn
+statsmodels
+joblib
+
+# === Signal decomposition and entropy ===
+EMD-signal
+vmdpy
+antropy
+
+# === Deep learning ===
+prophet
+transformers
+accelerate
+safetensors
+# Prefer the Conda-managed PyTorch build already used in the environment.
+
+# === Visualization and tools ===
+streamlit
+plotly
+matplotlib
+seaborn
+tqdm
+openpyxl
+pydantic-settings
+python-dotenv

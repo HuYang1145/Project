@@ -1,5 +1,5 @@
 # train_lstm_48h.py
-# 48小时(2天)预测模型：基于 CEEMDAN+BiLSTM+LEC 架构
+# 48-hour (2-day) forecasting model based on the CEEMDAN + BiLSTM + LEC pipeline
 import pandas as pd
 import numpy as np
 import torch
@@ -17,7 +17,7 @@ import antropy as ant
 warnings.filterwarnings('ignore')
 
 # ==========================================
-# 1. 配置 (48小时 = 2天)
+# 1. Configuration (48 hours = 2 days)
 # ==========================================
 class Config:
     CURRENT_DIR = os.getcwd()
@@ -25,8 +25,8 @@ class Config:
     DATA_PATH = os.path.abspath(os.path.join(CURRENT_DIR, f'../../data/processed/lstm/{TARGET_STATION}_PM2.5.csv'))
     MODEL_DIR = os.path.abspath(os.path.join(CURRENT_DIR, '../../models/lstm_48h'))
 
-    SEQ_LEN = 48       # 输入：过去48小时
-    TARGET_LEN = 48    # 输出：未来48小时
+    SEQ_LEN = 48       # Input: previous 48 hours
+    TARGET_LEN = 48    # Output: next 48 hours
     INPUT_SIZE = 1
 
     EPOCHS = 50
@@ -42,7 +42,7 @@ if not os.path.exists(Config.MODEL_DIR):
     os.makedirs(Config.MODEL_DIR)
 
 # ==========================================
-# 2. 网络定义
+# 2. Network definition
 # ==========================================
 class BiLSTMNet(nn.Module):
     def __init__(self, input_size=1, hidden_size=96, output_size=48):
@@ -71,7 +71,7 @@ class SingleComponentDataset(Dataset):
         return x, y.squeeze(-1)
 
 # ==========================================
-# 3. 核心函数
+# 3. Core functions
 # ==========================================
 def train_component_model(data_series, model_name):
     dataset = SingleComponentDataset(data_series, Config.SEQ_LEN, Config.TARGET_LEN)
@@ -129,7 +129,7 @@ def process_branch(branch_name, imfs_data_train, drop_idx_list):
     return models_list, preds_sum
 
 # ==========================================
-# 4. 主程序
+# 4. Main routine
 # ==========================================
 def main():
     print(">>> [Step 1] Loading Data...")
@@ -147,9 +147,9 @@ def main():
     rlmd_substitute = EEMD(trials=max(1, int(Config.EEMD_TRIALS/2)))
     imfs_b_all = rlmd_substitute(scaled_data)
 
-    print("\n    >>> Hardcoded drop IMF1 and IMF2 (high-frequency noise)...")
-    drop_idx_a = [0, 1]  # 丢弃 CEEMDAN IMF1, IMF2
-    drop_idx_b = [0, 1]  # 丢弃 RLMD IMF1, IMF2
+    print("\n    >>> Fixed drop IMF1 and IMF2 (PE-selected high-frequency modes for this dataset)...")
+    drop_idx_a = [0, 1]  # Fixed removal of CEEMDAN IMF1 and IMF2
+    drop_idx_b = [0, 1]  # Fixed removal of RLMD IMF1 and IMF2
 
     print("\n>>> [Step 3] Splitting 70/20/10...")
     total_len = len(scaled_data)

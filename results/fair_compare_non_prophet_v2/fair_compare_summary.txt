@@ -1,0 +1,20 @@
+Fair Comparison Summary (Analysis-Style)
+==================================================
+
+Horizon 3h
+  Best MAE : BiLSTM-Hybrid (5.7801)
+  Best RMSE: BiLSTM-Hybrid (7.8264)
+  Best R2  : BiLSTM-Hybrid (0.9411)
+  DiffSTG PI90 Coverage: 0.5851
+
+Horizon 6h
+  Best MAE : BiLSTM-Hybrid (6.8641)
+  Best RMSE: BiLSTM-Hybrid (10.0405)
+  Best R2  : BiLSTM-Hybrid (0.9030)
+  DiffSTG PI90 Coverage: 0.5473
+
+Horizon 12h
+  Best MAE : BiLSTM-Hybrid (11.8863)
+  Best RMSE: BiLSTM-Hybrid (16.2537)
+  Best R2  : BiLSTM-Hybrid (0.7458)
+  DiffSTG PI90 Coverage: 0.5753

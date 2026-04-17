@@ -1,18 +1,17 @@
-# db_utils.py
-import sqlite3
-import pandas as pd
 import os
-from datetime import datetime
+import sqlite3
 
-# Database file saved in demo directory
-DB_PATH = os.path.join(os.path.dirname(__file__), 'local_air_cache.db')
+import pandas as pd
+
+# Database file saved in the demo directory
+DB_PATH = os.path.join(os.path.dirname(__file__), "local_air_cache.db")
 
 def init_db():
-    """初始化数据库表：如果不存在就创建"""
+    """Create the database table if it does not already exist."""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    # 创建一张表：包含站点名、时间、PM2.5、以及天气特征
-    # UNIQUE(station, timestamp) 保证同一站点同一时间的数据不会重复插入
+    # Store station name, timestamp, PM2.5, and weather features.
+    # UNIQUE(station, timestamp) prevents duplicate inserts for the same point in time.
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS air_quality (
             station TEXT,
@@ -30,8 +29,10 @@ def init_db():
 
 def save_realtime_data(station, timestamp, pm25, temp=0, pres=0, dewp=0, wspm=0):
     """
-    将 API 获取到的最新数据存入数据库。
-    使用 INSERT OR REPLACE：如果时间点已存在，就更新它；不存在，就插入新行。
+    Save the latest API data to the database.
+
+    INSERT OR REPLACE updates an existing timestamp if present,
+    otherwise it inserts a new row.
     """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -44,10 +45,10 @@ def save_realtime_data(station, timestamp, pm25, temp=0, pres=0, dewp=0, wspm=0)
 
 def get_recent_data(station, limit=1000):
     """
-    从数据库中捞出该站点最近的 N 条数据，喂给 LSTM 进行平滑分解
+    Load the latest N samples for a station and feed them into the LSTM pipeline.
     """
     conn = sqlite3.connect(DB_PATH)
-    # 按时间降序拿最新的 limit 条，然后再通过 pandas 倒序回正常的时间流
+    # Read the newest rows first, then reverse them back to chronological order.
     query = f'''
         SELECT timestamp as ds, pm25 as y, temp as TEMP, pres as PRES, dewp as DEWP, wspm as WSPM
         FROM air_quality 
@@ -61,7 +62,7 @@ def get_recent_data(station, limit=1000):
     if df.empty:
         return df
         
-    # 因为是用 DESC 取的，最新的在最上面，需要反转回时间正序
+    # The DESC query returns newest first, so reverse the frame into time order.
     df = df.iloc[::-1].reset_index(drop=True)
     df['ds'] = pd.to_datetime(df['ds'])
     return df

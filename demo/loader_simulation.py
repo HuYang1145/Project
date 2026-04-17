@@ -1,145 +1,202 @@
 # loader_simulation.py
-# 专门用于毕设演示：从本地测试集数据中读取片段进行严格模拟
+# Strict local simulation using slices from the test set
+
+import os
+import random
+from datetime import timedelta
 
 import numpy as np
 import pandas as pd
-import os
-import random
-from datetime import datetime, timedelta
 import streamlit as st
 
-# 设定基础路径
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # 指向父目录
-DATA_DIR = os.path.join(BASE_DIR, 'data', 'processed', 'diffusion', 'AIR_BJ')
-FLOW_PATH = os.path.join(DATA_DIR, 'flow.npy')
+# Base paths
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Parent directory
+DATA_DIR = os.path.join(BASE_DIR, "data", "processed", "diffusion", "AIR_BJ")
+FLOW_PATH = os.path.join(DATA_DIR, "flow.npy")
 
-STATION_LIST = ['Aotizhongxin', 'Changping', 'Dingling', 'Dongsi', 'Guanyuan', 
-                'Gucheng', 'Huairou', 'Nongzhanguan', 'Shunyi', 'Tiantan', 
-                'Wanliu', 'Wanshouxigong', 'Daxing', 'Fangshan', 'Yizhuang', 
-                'Miyun', 'Yanqing', 'Yungang', 'Pinggu']
+STATION_LIST = [
+    "Aotizhongxin",
+    "Changping",
+    "Dingling",
+    "Dongsi",
+    "Guanyuan",
+    "Gucheng",
+    "Huairou",
+    "Nongzhanguan",
+    "Shunyi",
+    "Tiantan",
+    "Wanliu",
+    "Wanshouxigong",
+    "Daxing",
+    "Fangshan",
+    "Yizhuang",
+    "Miyun",
+    "Yanqing",
+    "Yungang",
+    "Pinggu",
+]
+
 
 @st.cache_data
 def load_full_data():
-    """一次性加载全量数据并缓存"""
+    """Load and cache the full diffusion dataset."""
     if not os.path.exists(FLOW_PATH):
-        st.error(f"❌ 找不到本地数据文件: {FLOW_PATH}")
+        st.error(f"Local data file not found: {FLOW_PATH}")
         return None
     return np.load(FLOW_PATH)
 
-def get_simulation_data(target_station='Dongsi'):
+
+@st.cache_data
+def load_neuralprophet_data():
+    """Load and cache the NeuralProphet backtesting frame."""
+    if not os.path.exists(NP_DATA_PATH):
+        st.error(f"NeuralProphet data file not found: {NP_DATA_PATH}")
+        return None
+
+    df = pd.read_csv(NP_DATA_PATH)
+    df["ds"] = pd.to_datetime(df["ds"])
+    return df
+
+
+def _ensure_shared_simulation_time():
     """
-    【学术严谨版】严格从 Test Set 中随机切取数据，并无缝对齐时间轴
+    Keep one shared cutoff time for all simulation loaders until the user
+    explicitly requests a new random sample.
     """
-    # 1. 🚨 被你不小心删掉的：加载数据和切片逻辑 🚨
-    data = load_full_data() # (Total_Time, 19, 1)
-    if data is None: return None, None, None
-    
-    total_len = data.shape[0]
-    
-    # 核心防作弊机制：严格定位到测试集 (最后20%)
+    df = load_neuralprophet_data()
+    if df is None or df.empty:
+        return None, None, None
+
+    total_len = len(df)
     test_start_idx = int(total_len * 0.8)
-    
-    # 切分点 t 必须在测试集范围内，且保证往前有 168h，往后有 12h
+    min_idx = test_start_idx + 168
+    max_idx = total_len - 24
+
+    max_offset = max_idx - min_idx
+    if max_offset < 0:
+        st.error("NeuralProphet simulation window is invalid.")
+        return None, None, None
+
+    if "sim_hour_offset" not in st.session_state or st.session_state.sim_hour_offset > max_offset:
+        st.session_state.sim_hour_offset = random.randint(0, max_offset)
+
+    offset = st.session_state.sim_hour_offset
+    cutoff_time = df.iloc[min_idx + offset - 1]["ds"]
+    st.session_state.sim_cutoff_time = cutoff_time
+    return cutoff_time, offset, max_offset
+
+
+def get_simulation_data(target_station="Dongsi"):
+    """Sample a strict test-set slice with a shared simulation cutoff time."""
+    data = load_full_data()  # (total_time, 19, 1)
+    if data is None:
+        return None, None, None
+
+    cutoff_time, shared_offset, shared_max_offset = _ensure_shared_simulation_time()
+    if cutoff_time is None:
+        return None, None, None
+
+    total_len = data.shape[0]
+
+    # Restrict sampling to the final 20% test split.
+    test_start_idx = int(total_len * 0.8)
+
+    # The split point must leave 168 hours behind and 12 hours ahead.
     min_idx = test_start_idx + 168
     max_idx = total_len - 12
-    
-    # Session State 保持页面刷新时不跳动
-    if 'sim_t' not in st.session_state or st.session_state.sim_t >= max_idx or st.session_state.sim_t < min_idx:
-        st.session_state.sim_t = random.randint(min_idx, max_idx)
-    
-    t = st.session_state.sim_t
-    
-    # 找到目标站点的索引
+
+    max_common_offset = max_idx - min_idx
+    if max_common_offset < 0:
+        st.error("Diffusion simulation window is invalid.")
+        return None, None, None
+
+    ratio = shared_offset / max(shared_max_offset, 1)
+    t = min_idx + int(round(ratio * max_common_offset))
+    t = max(min_idx, min(t, max_idx))
+
     if target_station in STATION_LIST:
         s_idx = STATION_LIST.index(target_station)
     else:
-        s_idx = 0 
-        
-    # 2. 🌟 时间轴无缝咬合逻辑 🌟
-    # 设定一个完美对齐的基准时间（当前整点），这就是“历史”的最后一刻
-    anchor_time = datetime.now().replace(minute=0, second=0, microsecond=0)
-    
-    # --- A. 构造 History DataFrame (给 Prophet/LSTM/ARIMA 用) ---
-    hist_vals = data[t-168:t, s_idx, 0]
-    # i=167时，167-167=0，完美停在 anchor_time
-    hist_dates = [anchor_time - timedelta(hours=167-i) for i in range(168)]
-    history_df = pd.DataFrame({'ds': hist_dates, 'y': hist_vals})
-    
-    # --- B. 构造 Ground Truth (未来真值) ---
-    gt_vals = data[t:t+12, s_idx, 0]
-    # 从 anchor_time 的下一个小时开始，严密咬合
-    gt_dates = [anchor_time + timedelta(hours=i+1) for i in range(12)]
-    ground_truth_df = pd.DataFrame({'ds': gt_dates, 'y': gt_vals})
+        s_idx = 0
 
-    # --- C. 构造伪造气象数据 (专给 Prophet 模拟用) ---
+    # A. History frame for Prophet/LSTM/ARIMA
+    hist_vals = data[t - 168 : t, s_idx, 0]
+    hist_dates = [cutoff_time - timedelta(hours=167 - i) for i in range(168)]
+    history_df = pd.DataFrame({"ds": hist_dates, "y": hist_vals})
+
+    # B. Future ground truth
+    gt_vals = data[t : t + 12, s_idx, 0]
+    gt_dates = [cutoff_time + timedelta(hours=i + 1) for i in range(12)]
+    ground_truth_df = pd.DataFrame({"ds": gt_dates, "y": gt_vals})
+
+    # C. Synthetic weather data for Prophet simulation
     weather_dates = hist_dates + gt_dates
-    weather_df = pd.DataFrame({
-        'ds': weather_dates,
-        'TEMP': [15.0 + random.uniform(-5, 5) for _ in range(180)],
-        'PRES': [1010.0 + random.uniform(-10, 10) for _ in range(180)],
-        'DEWP': [5.0 + random.uniform(-2, 2) for _ in range(180)],
-        'WSPM': [2.0 + random.uniform(-1, 3) for _ in range(180)],
-        'RAIN': [0.0 for _ in range(180)]
-    })
-    
-    # --- D. 构造 Diffusion Context (全量数据) ---
+    weather_df = pd.DataFrame(
+        {
+            "ds": weather_dates,
+            "TEMP": [15.0 + random.uniform(-5, 5) for _ in range(180)],
+            "PRES": [1010.0 + random.uniform(-10, 10) for _ in range(180)],
+            "DEWP": [5.0 + random.uniform(-2, 2) for _ in range(180)],
+            "WSPM": [2.0 + random.uniform(-1, 3) for _ in range(180)],
+            "RAIN": [0.0 for _ in range(180)],
+        }
+    )
+
+    # D. Diffusion context using the full dataset
     context = {
-        'type': 'simulation',
-        'full_data': data, 
-        'current_index': t, 
-        'station_index': s_idx,
-        'weather': weather_df  # 把伪造的天气打包塞进去给 Prophet
+        "type": "simulation",
+        "full_data": data,
+        "current_index": t,
+        "station_index": s_idx,
+        "weather": weather_df,
+        "sample_key": f"common:{shared_offset}:{cutoff_time.isoformat()}",
+        "simulated_cutoff_time": cutoff_time,
     }
-    
+
     return history_df, ground_truth_df, context
 
-def change_random_sample():
-    """切换随机样本（强制重新随机，但保持模型选择）"""
-    if 'sim_t' in st.session_state:
-        del st.session_state.sim_t
-    # 注意：不删除 locked_model_name，保持用户的模型选择状态
 
-# ==========================================
-# [新增] 专供 NeuralProphet 的数据加载逻辑
-# ==========================================
-NP_DATA_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'neuralprophet', 'Aotizhongxin_neuralprophet.csv')
+def change_random_sample():
+    """Force a new random sample while preserving the selected model."""
+    for key in ("sim_t", "sim_hour_offset", "sim_cutoff_time"):
+        if key in st.session_state:
+            del st.session_state[key]
+    # Keep locked_model_name so the user's model choice persists.
+
+
+# Dedicated NeuralProphet simulation loader
+NP_DATA_PATH = os.path.join(BASE_DIR, "data", "processed", "neuralprophet", "Aotizhongxin_neuralprophet.csv")
+
 
 def get_neuralprophet_simulation_data():
-    """从专属的 NeuralProphet 清洗数据中截取片段"""
-    if not os.path.exists(NP_DATA_PATH):
-        st.error(f"❌ 找不到 NeuralProphet 专属数据: {NP_DATA_PATH}")
+    """Sample a slice from the cleaned NeuralProphet dataset."""
+    df = load_neuralprophet_data()
+    if df is None or df.empty:
         return None, None, None
 
-    df = pd.read_csv(NP_DATA_PATH)
-    df['ds'] = pd.to_datetime(df['ds'])
-    
+    cutoff_time, shared_offset, _ = _ensure_shared_simulation_time()
+    if cutoff_time is None:
+        return None, None, None
+
     total_len = len(df)
     test_start_idx = int(total_len * 0.8)
-    
+
     min_idx = test_start_idx + 168
-    max_idx = total_len - 24  # NeuralProphet 预测 24 步
-    
-    if 'sim_t' not in st.session_state or st.session_state.sim_t >= max_idx or st.session_state.sim_t < min_idx:
-        st.session_state.sim_t = random.randint(min_idx, max_idx)
-        
-    t = st.session_state.sim_t
-    
-    # 锚点时间 (历史的最后一刻)
-    anchor_time = df['ds'].iloc[t-1]
-    
-    # 1. 历史数据 (过去 168 小时，包含 y 和 天气特征)
-    history_df = df.iloc[t-168 : t].copy()
-    
-    # 2. 未来真值 (未来 24 小时)
-    ground_truth_df = df.iloc[t : t+24][['ds', 'y']].copy()
-    
-    # 3. 未来天气特征 (NeuralProphet 必须知道未来的天气才能预测)
-    weather_df = df.iloc[t : t+24][['ds', 'TEMP', 'PRES', 'DEWP', 'RAIN', 'WSPM']].copy()
-    
+    max_idx = total_len - 24
+
+    t = min_idx + shared_offset
+    t = max(min_idx, min(t, max_idx))
+
+    history_df = df.iloc[t - 168 : t].copy()
+    ground_truth_df = df.iloc[t : t + 24][["ds", "y"]].copy()
+    weather_df = df.iloc[t : t + 24][["ds", "TEMP", "PRES", "DEWP", "RAIN", "WSPM"]].copy()
+
     context = {
-        'type': 'simulation',
-        'history': history_df,
-        'weather': weather_df
+        "type": "simulation",
+        "history": history_df[["ds", "y"]].copy(),
+        "weather": weather_df,
+        "sample_key": f"prophet:{shared_offset}:{cutoff_time.isoformat()}",
+        "simulated_cutoff_time": cutoff_time,
     }
-    
-    return history_df[['ds', 'y']], ground_truth_df, context
+
+    return history_df[["ds", "y"]], ground_truth_df, context

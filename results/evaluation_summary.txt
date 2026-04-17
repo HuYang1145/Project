@@ -1,0 +1,115 @@
+======================================================================
+Air Quality Prediction Models - Evaluation Summary
+Generated: 2026-03-09 21:51:27
+======================================================================
+
+[1] LONG-TERM TREND CLASSIFICATION MODELS
+----------------------------------------------------------------------
+
+1.1 Prophet Classification Model
+  - Prediction Horizon: N/A days
+  - Accuracy: N/A
+  - Macro F1-Score: N/A
+  - Prediction Horizon: N/A days
+  - Accuracy: N/A
+  - Macro F1-Score: N/A
+  - Prediction Horizon: N/A days
+  - Accuracy: N/A
+  - Macro F1-Score: N/A
+
+1.2 LSTM Classification Model
+  - 3-day prediction:
+    Accuracy: 0.365836197021764
+    Final Loss: 0.6761270463466644
+  - 5-day prediction:
+    Accuracy: 0.3670250896057347
+    Final Loss: 0.4813386021233206
+  - 7-day prediction:
+    Accuracy: 0.3576453697056712
+    Final Loss: 0.517138676737124
+
+[2] SHORT-TERM REGRESSION MODELS
+----------------------------------------------------------------------
+
+2.1 ARIMA Model
+--- [Multi-step Forecasting Evaluation] ---
+Model Configuration: ARIMA(1, 1, 2)
+
+Fitting model and forecasting the next 168 hours simultaneously...
+Forecasting completed in 0.36 seconds.
+
+Horizon    | MAE        | RMSE       | R-Squared 
+--------------------------------------------------
+3  Hours  | 4.0372     | 5.3397     | -1.6185   
+24 Hours  | 14.3433    | 18.5496    | -0.2978   
+168 Hours  | 39.8266    | 45.5176    | -0.3339   
+
+
+2.2 Prophet Model
+
+--- [Multi-step Forecasting Evaluation] ---
+Model Configuration: Prophet (with Meteorological Regressors)
+
+Horizon    | MAE        | RMSE       | R-Squared 
+--------------------------------------------------
+3  Hours  | 15.6667    | 17.2916    | -4.5830   
+24 Hours  | 28.3904    | 31.6097    | -5.3073   
+168 Hours  | 23.8948    | 29.2701    | -0.4079   
+
+Generating visualization plots for thesis...
+
+
+2.3 BiLSTM-Hybrid Model
+>>> [1] Loading Data, Scaler, and Config...
+Test data length: 9999
+Loaded BiLSTM-Hybrid Weights: w_A = 0.89, w_B = 0.11
+>>> [2] Generating Predictions and Applying LEC...
+LEC correction applied 1754 times.
+>>> [3] Multi-step Forecasting Evaluation
+Model Configuration: BiLSTM-Hybrid
+
+Horizon    | MAE        | RMSE       | R-Squared 
+------------------------------------------------
+3 Hours    | 5.1117     | 7.0794     | 0.9518    
+6 Hours    | 7.2453     | 10.4581    | 0.8947    
+12 Hours   | 12.0281    | 16.5188    | 0.7374    
+>>> [4] Generating Thesis Visualizations...
+
+
+2.4 DiffSTG (Diffusion) Model
+Running on local device: NVIDIA GeForce RTX 5080
+Detected dataset length: 99984
+Found a saved checkpoint archive. Restoring model weights from models/diffusion/checkpoints/AIR_BJ+False+True+False+0.002+8+0.0+UGnet+32+200+quad+0.1+200+ddpm+12+8N-200+T_h-12+T_p-12+epsilon_theta-UGnet.dm4stg...
+sample num: 59967
+sample num: 19974
+sample num: 19974
+Model Path: models/diffusion/checkpoints/AIR_BJ+False+True+False+0.002+8+0.0+UGnet+32+200+quad+0.1+200+ddpm+12+8N-200+T_h-12+T_p-12+epsilon_theta-UGnet.dm4stg
+Log Path: models/diffusion/logs/AIR_BJ+False+True+False+0.002+8+0.0+UGnet+32+200+quad+0.1+200+ddpm+12+8_test.log
+Start Training...
+      |---Train--- |---Val Future-- -|-----Val History----|
+Epoch | Loss  Time | MAE     RMSE    |  MAE    RMSE   Time|
+
+Best model loaded successfully.
+Testing with DDIM strategy...
+
+
+=======================================================
+>>> [Global Test Set - DiffSTG Multi-Horizon Evaluation] <<<
+Horizon    | MAE        | RMSE       | R-Squared 
+-------------------------------------------------------
+3 Hours    | 10.2286    | 15.9256    | 0.7817    
+6 Hours    | 16.5613    | 23.4946    | 0.5249    
+12 Hours   | 22.1974    | 29.7612    | 0.2373    
+=======================================================
+
+ |[15.79  23.27  ] | 0.17   0.24   798.58s
+
+Final Test Results: 15.79  23.27  144.52 0.36    184.50  | 1    
+
+
+2.5 Transformer Model
+  (Run notebooks/transformer/train_transformer.ipynb to generate metrics)
+
+======================================================================
+End of Summary
+======================================================================
