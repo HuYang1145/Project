@@ -35,6 +35,48 @@ git lfs pull
 
 如果你只想浏览代码和结果图，也可以不下载完整的 LFS 文件。
 
+### 老师下载说明 / 答辩提交说明
+
+如果你是老师、答辩委员，或只想快速检查项目内容，可以按下面步骤下载：
+
+#### 方案 A：只看代码、文档、结果图表
+
+1. 打开 GitHub 仓库页面。
+2. 点击 `Code`。
+3. 选择 `Download ZIP`，或直接执行：
+
+```bash
+git clone https://github.com/HuYang1145/Project.git
+```
+
+4. 这时可以直接查看代码、`README.md`、`results/` 下的图表与结果摘要。
+
+说明：
+- 这种方式适合查看论文支撑材料、代码结构、实验结果图和结果表。
+- 如果没有执行 Git LFS 拉取，`data/` 和 `models/` 中的大文件不会完整下载。
+
+#### 方案 B：下载完整可运行版本
+
+如果你需要运行演示系统，或检查 `data/` 与 `models/` 的真实文件，请按以下步骤操作：
+
+1. 先安装 Git LFS。
+2. 在终端执行：
+
+```bash
+git lfs install
+git clone https://github.com/HuYang1145/Project.git
+cd Project
+git lfs pull
+```
+
+3. 等待 `data/` 和 `models/` 下载完成。
+4. 再执行环境安装与系统运行命令。
+
+说明：
+- `data/` 和 `models/` 已上传到 Git LFS，不是普通 Git 小文件。
+- 仅使用 `Download ZIP` 通常不足以获得完整的大文件版本。
+- 若要完整复现或运行系统，建议使用 `git clone + git lfs pull`。
+
 ### 原始数据来源
 
 部分原始空气质量数据来源于公开网站：
@@ -125,6 +167,48 @@ git lfs pull
 ```
 
 If you only want to inspect the code and result figures, you do not need to download the full LFS assets.
+
+### Download Instructions for Examiners
+
+If you are an examiner, supervisor, or reviewer, use one of the following step-by-step options.
+
+#### Option A: Inspect code, documents, and result figures only
+
+1. Open the GitHub repository page.
+2. Click `Code`.
+3. Choose `Download ZIP`, or run:
+
+```bash
+git clone https://github.com/HuYang1145/Project.git
+```
+
+4. You can then inspect the source code, `README.md`, and the figures/summaries under `results/`.
+
+Notes:
+- This option is enough if you mainly want to review the code structure, thesis-supporting figures, and result summaries.
+- Without Git LFS pulling, the large files under `data/` and `models/` will not be fully downloaded.
+
+#### Option B: Download the full runnable version
+
+If you need the actual `data/` and `models/` files and want to run the demo system, follow these steps:
+
+1. Install Git LFS first.
+2. Run:
+
+```bash
+git lfs install
+git clone https://github.com/HuYang1145/Project.git
+cd Project
+git lfs pull
+```
+
+3. Wait until all LFS assets under `data/` and `models/` are downloaded.
+4. Then install dependencies and run the project.
+
+Notes:
+- `data/` and `models/` are stored through Git LFS rather than regular Git blobs.
+- `Download ZIP` alone is usually not sufficient for obtaining the full large-file version.
+- For full reproduction or demo execution, use `git clone + git lfs pull`.
 
 ### Raw Data Source
 
