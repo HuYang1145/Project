@@ -12,6 +12,7 @@ scipy
 scikit-learn
 statsmodels
 joblib
+requests
 
 # === Signal decomposition and entropy ===
 EMD-signal
@@ -19,10 +20,13 @@ vmdpy
 antropy
 
 # === Deep learning ===
+tqdm
+nbformat
 prophet
 transformers
 accelerate
 safetensors
+torch
 # Prefer the Conda-managed PyTorch build already used in the environment.
 
 # === Visualization and tools ===
@@ -30,7 +34,6 @@ streamlit
 plotly
 matplotlib
 seaborn
-tqdm
 openpyxl
 pydantic-settings
 python-dotenv

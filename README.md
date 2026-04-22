@@ -87,12 +87,47 @@ git lfs pull
 
 ### 环境配置
 
-建议使用项目原始环境：
+建议使用名为 `project` 的 Conda 环境。推荐按以下步骤配置：
+
+1. 创建环境：
+
+```bash
+conda create -n project python=3.11 -y
+```
+
+2. 激活环境：
 
 ```bash
 conda activate project
+```
+
+3. 先安装 PyTorch。
+
+本项目演示系统和 LSTM / DiffSTG 相关脚本依赖 `torch`。作者当前本地环境使用的是 Conda 环境中的 PyTorch；如果你的机器有 NVIDIA GPU，请优先按 PyTorch 官网对应版本说明安装 GPU 版本。如果你只需要基础运行或查看代码，也可以安装 CPU 版本。
+
+示例：
+
+```bash
+# CPU 示例
+pip install torch
+```
+
+4. 再安装其余依赖：
+
+```bash
 pip install -r requirements.txt
 ```
+
+5. 如需使用 Notebook：
+
+```bash
+python -m ipykernel install --user --name project --display-name "Python (project)"
+```
+
+补充说明：
+- `requirements.txt` 已包含常用运行、可视化、Prophet、分解、Notebook 相关依赖。
+- 若 `prophet` 安装较慢，通常属于正常现象，因为它会同时安装 `cmdstanpy` 等相关组件。
+- 若只查看代码和结果图，不运行重模型脚本，环境压力会明显更小。
 
 ### 运行演示系统
 
@@ -220,12 +255,47 @@ If the raw data can be stably obtained from the original public source, it is be
 
 ### Environment Setup
 
-Recommended environment:
+It is recommended to use a Conda environment named `project`. A step-by-step setup is:
+
+1. Create the environment:
+
+```bash
+conda create -n project python=3.11 -y
+```
+
+2. Activate it:
 
 ```bash
 conda activate project
+```
+
+3. Install PyTorch first.
+
+The demo system and the LSTM / DiffSTG-related scripts depend on `torch`. The author's local environment uses a Conda-managed PyTorch build. If you have an NVIDIA GPU, install the matching GPU build following the official PyTorch instructions. If you only need a basic runnable setup, a CPU build is also acceptable.
+
+Example:
+
+```bash
+# CPU example
+pip install torch
+```
+
+4. Install the remaining dependencies:
+
+```bash
 pip install -r requirements.txt
 ```
+
+5. If you want to use Jupyter notebooks:
+
+```bash
+python -m ipykernel install --user --name project --display-name "Python (project)"
+```
+
+Notes:
+- `requirements.txt` includes the main runtime, plotting, Prophet, decomposition, and notebook-related dependencies.
+- `prophet` may take longer to install than lightweight packages; this is normal.
+- If you only want to inspect code and result figures, the environment requirements are much lighter than full model reproduction.
 
 ### Running the Demo
 
