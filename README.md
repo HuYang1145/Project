@@ -1,55 +1,140 @@
 # Time Series Forecasting of Urban Air Pollution with Machine Learning
 
-This repository contains the code, system prototype, experiment scripts, and thesis workspace for the QMUL/BUPT undergraduate final-year project on urban air-quality forecasting. The project studies Beijing PM2.5 forecasting under real deployment constraints and implements an end-to-end workflow covering data preprocessing, model inference, risk alerting, and interactive visualization.
+[中文说明](#中文说明) | [English](#english)
 
-## Project Scope
+## 中文说明
 
-The repository supports two closely related goals:
+### 项目简介
 
-1. Research: compare multiple forecasting paradigms for PM2.5 prediction, including statistical baselines, a decomposition-driven BiLSTM-Hybrid model, and a diffusion-based spatio-temporal probabilistic model.
-2. Engineering: deliver a runnable forecasting dashboard with local caching, on-demand model loading, 48-hour alert generation, and simulation-based evaluation.
+本仓库是 QMUL / BUPT 本科毕业设计项目 `Time Series Forecasting of Urban Air Pollution with Machine Learning` 的代码与结果公开版。项目聚焦北京市 PM2.5 浓度预测，在真实部署约束下结合时间序列建模、风险预警与交互式可视化，构建了一个端到端空气质量预测系统。
 
-The final research conclusion of the project is that `BiLSTM-Hybrid` is the most suitable model for accurate point forecasting in the current deployment setting, while `DiffSTG` is retained as the uncertainty-analysis branch.
+当前项目定位如下：
 
-## Repository Layout
+- `BiLSTM-Hybrid` 是当前部署设定下的主点预测模型
+- `DiffSTG` 保留为不确定性分析 / 概率预测分支
+- 仓库主要公开代码、实验脚本与结果摘要
+- `data/` 与 `models/` 通过 Git LFS 随仓库分发，克隆后需拉取 LFS 文件
 
-- `demo/`: runnable Streamlit application and online/offline inference workflow
-- `notebooks/`: model-specific experiments, training notebooks, and analysis scripts
-- `data/`: raw or intermediate datasets used by the forecasting pipeline
-- `models/`: trained model artifacts and serialized preprocessing objects
-- `results/`: generated metrics, comparison summaries, and figure outputs
-- `毕业论文中文/`: Chinese thesis XeLaTeX workspace
-- `毕业论文英文/`: English thesis XeLaTeX workspace
-- `summarize_results.py`: utility script for aggregating experiment outputs
+### 仓库内容
 
-## Models Included
+本 GitHub 仓库主要包含以下内容：
 
-### ARIMA
+- `demo/`: Streamlit 演示系统
+- `notebooks/`: 各模型的数据处理、训练与分析脚本
+- `results/`: 论文相关图表、汇总结果与评估摘要
+- `requirements.txt`: Python 依赖
 
-Classical univariate statistical baseline used for lightweight short-horizon extrapolation and benchmarking.
+### 数据与模型下载
 
-### Prophet
+本项目使用 Git LFS 管理 `data/` 与 `models/` 下的大文件。克隆仓库后，请先安装并初始化 Git LFS：
 
-Interpretable regression-based baseline using meteorological covariates for trend and attribution analysis.
+```bash
+git lfs install
+git lfs pull
+```
 
-### BiLSTM-Hybrid
+如果你只想浏览代码和结果图，也可以不下载完整的 LFS 文件。
 
-Primary point-forecasting model that combines CEEMDAN/EEMD signal decomposition, bidirectional LSTM sequence modeling, and local error correction (LEC).
+### 原始数据来源
 
-### DiffSTG
+部分原始空气质量数据来源于公开网站：
 
-Spatio-temporal diffusion model used for probabilistic forecasting and uncertainty-aware risk-boundary analysis.
+- Quotsoft Beijing Air Pollution Historical Data: <https://quotsoft.net/air/>
 
-## Data Description
+如果原始数据已经可从公开来源稳定获取，建议优先使用原始来源；本仓库中的 `data/` 主要保存项目复现与演示所需的数据文件。
 
-The project uses two main data branches:
+### 环境配置
 
-- A univariate Beijing PM2.5 time-series dataset for `ARIMA`, `BiLSTM-Hybrid`, and `DiffSTG`
-- A multivariate Beijing air-quality plus meteorology dataset for `Prophet`
+建议使用项目原始环境：
 
-The deployed demo additionally supports external API-fed real-time mode through locally cached weather and air-quality inputs.
+```bash
+conda activate project
+pip install -r requirements.txt
+```
 
-## Environment Setup
+### 运行演示系统
+
+```bash
+cd demo
+streamlit run app.py
+```
+
+系统支持：
+
+- 实时 API 模式
+- 历史仿真模式
+- 多模型切换预测
+- PM2.5 预测曲线可视化
+- 48 小时污染预警
+
+### 复现实验结果
+
+生成结果汇总：
+
+```bash
+python results/summarize_results.py
+```
+
+运行缓存检查：
+
+```bash
+python demo/test_cache.py
+```
+
+### 说明
+
+- 本仓库为公开展示与复现导向版本，不包含全部原始数据、缓存数据库和训练中间文件
+- `BiLSTM-Hybrid` 与 `DiffSTG` 资源占用较高，日常演示时不建议同时加载
+- 若仓库中的结果图、指标摘要与论文正文存在差异，应以最终提交论文版本为准
+
+### 引用
+
+如果你复用了本项目的代码、图表或结果，请注明来源，并说明是否进行了修改。
+
+---
+
+## English
+
+### Overview
+
+This repository is the public code-and-results release of the QMUL / BUPT undergraduate final-year project `Time Series Forecasting of Urban Air Pollution with Machine Learning`. The project focuses on Beijing PM2.5 forecasting under practical deployment constraints and builds an end-to-end system covering forecasting, alerting, and interactive visualization.
+
+The current project positioning is:
+
+- `BiLSTM-Hybrid` is the main point-forecasting model in the deployed setting
+- `DiffSTG` is retained as the uncertainty-analysis / probabilistic forecasting branch
+- This GitHub repository mainly publishes code, experiment scripts, and result summaries
+- `data/` and `models/` are distributed with the repository through Git LFS
+
+### Repository Contents
+
+This GitHub repository mainly includes:
+
+- `demo/`: the runnable Streamlit demo system
+- `notebooks/`: preprocessing, training, and analysis scripts for different models
+- `results/`: thesis-related figures, summaries, and evaluation outputs
+- `requirements.txt`: Python dependencies
+
+### Data and Model Downloads
+
+This project uses Git LFS for large files under `data/` and `models/`. After cloning the repository, install and pull LFS objects:
+
+```bash
+git lfs install
+git lfs pull
+```
+
+If you only want to inspect the code and result figures, you do not need to download the full LFS assets.
+
+### Raw Data Source
+
+Part of the raw air-quality data comes from the following public source:
+
+- Quotsoft Beijing Air Pollution Historical Data: <https://quotsoft.net/air/>
+
+If the raw data can be stably obtained from the original public source, it is better to use that source directly. The repository `data/` directory mainly keeps the files needed for reproduction and demo usage.
+
+### Environment Setup
 
 Recommended environment:
 
@@ -58,69 +143,41 @@ conda activate project
 pip install -r requirements.txt
 ```
 
-## Running the Demo
-
-Start the Streamlit dashboard from the `demo/` directory:
+### Running the Demo
 
 ```bash
 cd demo
 streamlit run app.py
 ```
 
-The dashboard supports:
+The system supports:
 
-- real-time mode with cached API-backed inputs
-- historical simulation mode for reproducible backtesting
-- multiple selectable forecasting models
-- PM2.5 forecast visualization with optional interval display
-- 48-hour AQI-oriented pollution alert generation
+- real-time API mode
+- historical simulation mode
+- multi-model forecasting
+- PM2.5 forecast visualization
+- 48-hour pollution alerting
 
-## Reproducing Key Outputs
+### Reproducing Key Outputs
 
-Generate the aggregated experiment summary:
+Generate the summary report:
 
 ```bash
-python summarize_results.py
+python results/summarize_results.py
 ```
 
-Run the cache regression check:
+Run the cache check:
 
 ```bash
 python demo/test_cache.py
 ```
 
-Inspect the local demo cache when needed:
+### Notes
 
-```bash
-cd demo
-sqlite3 local_air_cache.db "SELECT COUNT(*) FROM air_quality;"
-```
+- This is a public-facing repository for presentation and reproducibility; it does not include all raw data, local caches, or intermediate training artifacts
+- `BiLSTM-Hybrid` and `DiffSTG` are both resource-heavy and should not normally be loaded together for routine demo usage
+- If any discrepancy exists between this repository and the final submitted thesis, the final thesis version should be treated as authoritative
 
-## Thesis Workspaces
+### Citation
 
-The repository also contains the complete XeLaTeX source for the Chinese and English thesis versions:
-
-- [毕业论文中文](D:/文件/大四下/Project/毕业论文中文)
-- [毕业论文英文](D:/文件/大四下/Project/毕业论文英文)
-
-These folders include source files, figures, appendices, and generated PDFs. Changes to thesis source files should be followed by a XeLaTeX rebuild.
-
-## Engineering Notes
-
-- `BiLSTM-Hybrid` and `DiffSTG` are both resource-heavy and should not normally be loaded together for routine demo use.
-- AQI-related changes should keep `demo/aqi_classifier.py`, `demo/predictor.py`, and the Streamlit UI behavior aligned.
-- The system uses on-demand loading and local SQLite caching to reduce cold-start latency and memory pressure.
-
-## Limitations
-
-- Large data files, model artifacts, and local caches may not be suitable for full public distribution.
-- Some experiment paths depend on locally prepared datasets or pretrained weights.
-- `DiffSTG` currently serves as the uncertainty-analysis branch rather than the main online forecasting backbone due to its latency cost.
-
-## Citation and Context
-
-This repository accompanies the undergraduate project report:
-
-`Time Series Forecasting of Urban Air Pollution with Machine Learning`
-
-If you reuse the code or figures, cite the corresponding thesis source and clearly indicate any modified components.
+If you reuse the code, figures, or results from this project, please cite the project appropriately and indicate any modifications.

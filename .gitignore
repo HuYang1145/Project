@@ -11,24 +11,10 @@ dist/
 build/
 
 # Jupyter Notebook
-.ipynb_checkpoints
+.ipynb_checkpoints/
 *.ipynb
 
-# 模型文件（太大）
-models/
-*.pkl
-*.pth
-*.joblib
-*.dm4stg
-
-# 数据文件（太大）
-data/raw/
-data/processed/
-data/dataset/
-*.csv
-*.npy
-
-# 数据库
+# Database and local cache
 *.db
 *.sqlite
 
@@ -38,29 +24,25 @@ data/dataset/
 *.swp
 *.swo
 
-# 系统文件
+# System files
 .DS_Store
 Thumbs.db
 __MACOSX/
 
-# 日志
+# Logs and temp files
 *.log
-
-# 临时文件
 *.tmp
 *.temp
 
-# LaTeX
+# LaTeX build artifacts
 *.aux
 *.bbl
 *.blg
-*.log
 *.out
 *.toc
 *.synctex.gz
 *.fdb_latexmk
 *.fls
-*.pdf
+*.xdv
 
-# 结果图片（可选保留）
-# results/figures_summary/*.png
+# Large data and model artifacts are tracked with Git LFS
